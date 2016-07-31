@@ -1,10 +1,11 @@
 import sys
 import re
 import gevent
-import urlparse
+from six.moves.urllib.parse import parse_qs
 
 from gevent.pywsgi import WSGIHandler
 from socketio import transports
+
 
 class SocketIOHandler(WSGIHandler):
     RE_REQUEST_URL = re.compile(r"""
@@ -45,12 +46,12 @@ class SocketIOHandler(WSGIHandler):
 
         super(SocketIOHandler, self).__init__(*args, **kwargs)
 
-        self.transports = self.handler_types.keys()
+        self.transports = list(self.handler_types.keys())
         if self.server.transports:
             self.transports = self.server.transports
             if not set(self.transports).issubset(set(self.handler_types)):
                 raise ValueError("transports should be elements of: %s" %
-                    (self.handler_types.keys()))
+                    list(self.handler_types.keys()))
 
     def _do_handshake(self, tokens):
         if tokens["resource"] != self.server.resource:
@@ -58,10 +59,10 @@ class SocketIOHandler(WSGIHandler):
         else:
             socket = self.server.get_socket()
             data = "%s:%s:%s:%s" % (socket.sessid,
-                                    self.config['heartbeat_timeout'] or '',
-                                    self.config['close_timeout'] or '',
-                                    ",".join(self.transports))
-            self.write_smart(data)
+                                     self.config['heartbeat_timeout'] or '',
+                                     self.config['close_timeout'] or '',
+                                     ",".join(self.transports))
+            self.write_smart(data.encode('latin-1'))
 
     def write_jsonp_result(self, data, wrapper="0"):
         self.start_response("200 OK", [
@@ -80,7 +81,7 @@ class SocketIOHandler(WSGIHandler):
         self.result = [data]
 
     def write_smart(self, data):
-        args = urlparse.parse_qs(self.environ.get("QUERY_STRING"))
+        args = parse_qs(self.environ.get("QUERY_STRING"))
 
         if "jsonp" in args:
             self.write_jsonp_result(data, args["jsonp"][0])
