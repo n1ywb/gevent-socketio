@@ -214,7 +214,7 @@ class SocketIOHandler(WSGIHandler):
         self.start_response("400 Bad Request", [
             ('Content-Type', 'text/plain'),
             ('Connection', 'close'),
-            ('Content-Length', 0)
+            ('Content-Length', '0')
         ])
 
 
@@ -223,5 +223,5 @@ class SocketIOHandler(WSGIHandler):
         self.start_response("200 OK", [
             ('Content-Type', 'text/plain'),
             ('Connection', 'close'),
-            ('Content-Length', 0)
+            ('Content-Length', '0')
         ])
