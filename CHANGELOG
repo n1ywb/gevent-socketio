@@ -1,3 +1,16 @@
+New in 0.3.7-es (since 0.3.6)
+-----------------------------
+Releasing new version under the name "gevent-socketio-es" with following changes/merge requests:
+
+    * Setting Content-Length Headers to Strings - abourget/gevent-socketio#241 (by https://github.com/richardardrichard)
+    * Stop re-raising exception on dead websocket - abourget/gevent-socketio#240 (by https://github.com/richardardrichard)
+    * Fixed import to support Django>=1.9 - abourget/gevent-socketio#236 (by https://github.com/chrisspen)
+    * Fix cfg_addr error on socket object - copied from abourget/gevent-socketio#200 (by https://github.com/shuoli84)
+    * Fixes unicode error with newest gevent - abourget/gevent-socketio#221 (by https://github.com/bobvandevijver)
+    * Fixes memory leak issue - abourget/gevent-socketio#225 (by https://github.com/chrismeyersfsu)
+    * Full Python 2+3 support - commit 12da9667 (by https://github.com/Eugeny)
+    * Travis script fix  - commit 13cd65e6 (by https://github.com/Eugeny)
+
 New in 0.3.6 (since 0.3.5-rc3)
 -----------------------------
 
