@@ -28,18 +28,18 @@ class PyTest(TestCommand):
         pytest.main(self.test_args)
 
 setup(
-    name="gevent-socketio",
-    version="0.3.6",
+    name="gevent-socketio-es",
+    version="0.3.7",
     description=(
         "SocketIO server based on the Gevent pywsgi server, "
         "a Python network library"),
     author="Jeffrey Gelens",
     author_email="jeffrey@noppo.pro",
-    maintainer="Alexandre Bourget",
-    maintainer_email="alex@bourget.cc",
+    maintainer="Erigones",
+    maintainer_email="erigones [at] erigones.com",
     license="BSD",
-    url="https://github.com/abourget/gevent-socketio",
-    download_url="https://github.com/abourget/gevent-socketio",
+    url="https://github.com/erigones/gevent-socketio",
+    download_url="https://github.com/erigones/gevent-socketio",
     install_requires=get_reqs('pip-requirements.txt'),
     setup_requires=('versiontools >= 1.7'),
     cmdclass = {'test': PyTest},

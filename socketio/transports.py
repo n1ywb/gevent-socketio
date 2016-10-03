@@ -1,6 +1,6 @@
 import gevent
-import six
-from six.moves.urllib.parse import parse_qs, unquote_plus
+import urllib
+import urlparse
 from geventwebsocket import WebSocketError
 from gevent.queue import Empty
 
@@ -21,7 +21,7 @@ class BaseTransport(object):
             ("Access-Control-Allow-Origin", "*"),
             ("Access-Control-Allow-Credentials", "true"),
             ("Access-Control-Allow-Methods", "POST, GET, OPTIONS"),
-            ("Access-Control-Max-Age", "3600"),
+            ("Access-Control-Max-Age", 3600),
         ]
         self.handler = handler
         self.config = config
@@ -162,7 +162,7 @@ class JSONPolling(XHRPollingTransport):
     def _request_body(self):
         data = super(JSONPolling, self)._request_body()
         # resolve %20%3F's, take out wrapping d="...", etc..
-        data = unquote_plus(data)[3:-1] \
+        data = urllib.unquote_plus(data)[3:-1] \
                      .replace(r'\"', '"') \
                      .replace(r"\\", "\\")
 
@@ -175,7 +175,7 @@ class JSONPolling(XHRPollingTransport):
 
     def write(self, data):
         """Just quote out stuff before sending it out"""
-        args = parse_qs(self.handler.environ.get("QUERY_STRING"))
+        args = urlparse.parse_qs(self.handler.environ.get("QUERY_STRING"))
         if "i" in args:
             i = args["i"]
         else:
@@ -249,9 +249,7 @@ class WebsocketTransport(BaseTransport):
                     break
                 try:
                     websocket.send(message)
-                except (WebSocketError, TypeError) as e:
-                    print(e)
-                    raise
+                except (WebSocketError, TypeError):
                     # We can't send a message on the socket
                     # it is dead, let the other sockets know
                     socket.disconnect()

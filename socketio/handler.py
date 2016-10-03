@@ -1,11 +1,10 @@
 import sys
 import re
 import gevent
-from six.moves.urllib.parse import parse_qs
+import urlparse
 
 from gevent.pywsgi import WSGIHandler
 from socketio import transports
-
 
 class SocketIOHandler(WSGIHandler):
     RE_REQUEST_URL = re.compile(r"""
@@ -46,12 +45,12 @@ class SocketIOHandler(WSGIHandler):
 
         super(SocketIOHandler, self).__init__(*args, **kwargs)
 
-        self.transports = list(self.handler_types.keys())
+        self.transports = self.handler_types.keys()
         if self.server.transports:
             self.transports = self.server.transports
             if not set(self.transports).issubset(set(self.handler_types)):
                 raise ValueError("transports should be elements of: %s" %
-                    list(self.handler_types.keys()))
+                    (self.handler_types.keys()))
 
     def _do_handshake(self, tokens):
         if tokens["resource"] != self.server.resource:
@@ -59,10 +58,10 @@ class SocketIOHandler(WSGIHandler):
         else:
             socket = self.server.get_socket()
             data = "%s:%s:%s:%s" % (socket.sessid,
-                                     self.config['heartbeat_timeout'] or '',
-                                     self.config['close_timeout'] or '',
-                                     ",".join(self.transports))
-            self.write_smart(data.encode('latin-1'))
+                                    self.config['heartbeat_timeout'] or '',
+                                    self.config['close_timeout'] or '',
+                                    ",".join(self.transports))
+            self.write_smart(data)
 
     def write_jsonp_result(self, data, wrapper="0"):
         self.start_response("200 OK", [
@@ -75,13 +74,13 @@ class SocketIOHandler(WSGIHandler):
             ("Access-Control-Allow-Origin", self.environ.get('HTTP_ORIGIN', '*')),
             ("Access-Control-Allow-Credentials", "true"),
             ("Access-Control-Allow-Methods", "POST, GET, OPTIONS"),
-            ("Access-Control-Max-Age", "3600"),
+            ("Access-Control-Max-Age", 3600),
             ("Content-Type", "text/plain"),
         ])
         self.result = [data]
 
     def write_smart(self, data):
-        args = parse_qs(self.environ.get("QUERY_STRING"))
+        args = urlparse.parse_qs(self.environ.get("QUERY_STRING"))
 
         if "jsonp" in args:
             self.write_jsonp_result(data, args["jsonp"][0])
@@ -206,6 +205,7 @@ class SocketIOHandler(WSGIHandler):
                 del self.websocket.environ
             del self.websocket
         if self.environ:
+            self.environ.pop('wsgi.websocket', None)
             del self.environ
 
     def handle_bad_request(self):
@@ -213,7 +213,7 @@ class SocketIOHandler(WSGIHandler):
         self.start_response("400 Bad Request", [
             ('Content-Type', 'text/plain'),
             ('Connection', 'close'),
-            ('Content-Length', 0)
+            ('Content-Length', '0')
         ])
 
 
@@ -222,5 +222,5 @@ class SocketIOHandler(WSGIHandler):
         self.start_response("200 OK", [
             ('Content-Type', 'text/plain'),
             ('Connection', 'close'),
-            ('Content-Length', 0)
+            ('Content-Length', '0')
         ])
