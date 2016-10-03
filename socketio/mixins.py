@@ -5,8 +5,6 @@ generally useful for most simple projects, e.g. Rooms, Broadcast.
 You'll likely want to create your own Mixins.
 """
 
-import six
-
 
 class RoomsMixin(object):
     def __init__(self, *args, **kwargs):
@@ -32,7 +30,7 @@ class RoomsMixin(object):
                    args=args,
                    endpoint=self.ns_name)
         room_name = self._get_room_name(room)
-        for sessid, socket in six.iteritems(self.socket.server.sockets):
+        for sessid, socket in self.socket.server.sockets.iteritems():
             if 'rooms' not in socket.session:
                 continue
             if room_name in socket.session['rooms'] and self.socket != socket:
@@ -57,7 +55,7 @@ class BroadcastMixin(object):
                    args=args,
                    endpoint=self.ns_name)
 
-        for sessid, socket in six.iteritems(self.socket.server.sockets):
+        for sessid, socket in self.socket.server.sockets.iteritems():
             socket.send_packet(pkt)
 
     def broadcast_event_not_me(self, event, *args):
@@ -70,6 +68,6 @@ class BroadcastMixin(object):
                    args=args,
                    endpoint=self.ns_name)
 
-        for sessid, socket in six.iteritems(self.socket.server.sockets):
+        for sessid, socket in self.socket.server.sockets.iteritems():
             if socket is not self.socket:
                 socket.send_packet(pkt)

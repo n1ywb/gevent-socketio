@@ -109,7 +109,7 @@ class SocketIOServer(WSGIServer):
             try:
                 if not self.policy_server.started:
                     self.policy_server.start()
-            except error as ex:
+            except error, ex:
                 sys.stderr.write(
                     'FAILED to start flash policy server: %s\n' % (ex, ))
             except Exception:
